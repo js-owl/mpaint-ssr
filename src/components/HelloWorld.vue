@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <div>mpaint-ssr3</div>
+  <div>mpaint-ssr4</div>
 </template>
 
 <style scoped>
