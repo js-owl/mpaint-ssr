@@ -1,14 +1,19 @@
 version: '3.8'
 
 services:
-  mpaint-ssr:
-    build: .
+  vue-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vue-nginx-app
     ports:
-      - "3000:3000"
-    volumes:
-      - ./src:/app/src
-      - ./public:/app/public
+      - "8080:80"
+    restart: unless-stopped
     environment:
       - NODE_ENV=production
-    restart: unless-stopped
+    networks:
+      - vue-network
 
+networks:
+  vue-network:
+    driver: bridge
