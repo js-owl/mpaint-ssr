@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: vue-nginx-app
+    container_name: cname
     ports:
       - "8080:80"
     restart: unless-stopped
