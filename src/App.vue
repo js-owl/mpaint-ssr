@@ -1,5 +1,5 @@
 <template>
-  <div class="app">nginx + vue + 3</div>
+  <div class="app">compose + nginx + vue + 1</div>
 </template>
 
 <script setup lang="ts"></script>
