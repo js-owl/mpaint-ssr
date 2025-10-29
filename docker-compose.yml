@@ -1,9 +1,9 @@
 services:
   vue-app:
     build:
-      context: .
+      context: ./frontend
       dockerfile: Dockerfile
-    container_name: cname
+    container_name: c_front
     ports:
       - "8080:80"
     restart: unless-stopped
@@ -14,7 +14,7 @@ services:
 
   api:
     image: python:3.11-slim
-    container_name: api
+    container_name: c_back
     working_dir: /app
     volumes:
       - ./backend:/app
