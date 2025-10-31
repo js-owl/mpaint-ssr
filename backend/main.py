@@ -1,5 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
+from database import init_db, get_db, Product
 import random
 
 
@@ -15,41 +17,74 @@ app.add_middleware(
 )
 
 
+@app.on_event("startup")
+def startup_event():
+    # Создаем таблицы при запуске приложения
+    init_db()
+    # Заполняем базу данных начальными данными, если она пуста
+    db_gen = get_db()
+    db = next(db_gen)
+    try:
+        count = db.query(Product).count()
+        if count == 0:
+            categories = [
+                "Electronics",
+                "Books",
+                "Home",
+                "Toys",
+                "Clothing",
+                "Sports",
+                "Garden",
+            ]
+
+            products = [
+                "Wireless Mouse",
+                "USB-C Charger",
+                "LED Desk Lamp",
+                "Stainless Water Bottle",
+                "Bluetooth Speaker",
+                "Yoga Mat",
+                "Novel Paperback",
+                "Coffee Mug",
+                "Backpack",
+                "Board Game",
+            ]
+
+            items = []
+            for i in range(1, 6):
+                item = Product(
+                    id=i,
+                    category=random.choice(categories),
+                    product=random.choice(products),
+                    price=round(random.uniform(5.0, 250.0), 2),
+                )
+                items.append(item)
+
+            db.add_all(items)
+            db.commit()
+    except Exception as e:
+        db.rollback()
+        print(f"Ошибка при инициализации базы данных: {e}")
+    finally:
+        db.close()
+
+
 @app.get("/")
-async def read_root():
-    categories = [
-        "Electronics",
-        "Books",
-        "Home",
-        "Toys",
-        "Clothing",
-        "Sports",
-        "Garden",
-    ]
-
-    products = [
-        "Wireless Mouse",
-        "USB-C Charger",
-        "LED Desk Lamp",
-        "Stainless Water Bottle",
-        "Bluetooth Speaker",
-        "Yoga Mat",
-        "Novel Paperback",
-        "Coffee Mug",
-        "Backpack",
-        "Board Game",
-    ]
-
+def read_root(db: Session = Depends(get_db)):
+    # Получаем все продукты из базы данных
+    products = db.query(Product).all()
+    
+    # Преобразуем в список словарей
     items = []
-    for i in range(1, 6):
+    for product in products:
         item = {
-            "id": i,
-            "category": random.choice(categories),
-            "product": random.choice(products),
-            "price": round(random.uniform(5.0, 250.0), 2),
+            "id": product.id,
+            "category": product.category,
+            "product": product.product,
+            "price": float(product.price),
         }
         items.append(item)
-
+    
     return items
 
 

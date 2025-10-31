@@ -21,6 +21,25 @@ services:
     command: sh -c "pip install --no-cache-dir -r requirements.txt && uvicorn main:app --host 0.0.0.0 --port 8000"
     ports:
       - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://mpaint_user:mpaint_pass@db:5432/mpaint_db
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      - vue-network
+
+  db:
+    image: postgres:15-alpine
+    container_name: c_db
+    environment:
+      - POSTGRES_USER=mpaint_user
+      - POSTGRES_PASSWORD=mpaint_pass
+      - POSTGRES_DB=mpaint_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     restart: unless-stopped
     networks:
       - vue-network
@@ -28,3 +47,6 @@ services:
 networks:
   vue-network:
     driver: bridge
+
+volumes:
+  postgres_data:
