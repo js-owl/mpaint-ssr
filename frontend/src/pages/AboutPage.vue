@@ -14,7 +14,9 @@ const error = ref<string>('')
 
 onMounted(async () => {
   try {
-    const response = await fetch('http://localhost:8000/')
+    const baseURL = 'http://81.177.166.4:8000/'
+    console.log(import.meta.env)
+    const response = await fetch(`${baseURL}/`)
     if (!response.ok) throw new Error(`Request failed: ${response.status}`)
     const data: Item[] = await response.json()
     items.value = data
