@@ -8,53 +8,8 @@ from contextlib import asynccontextmanager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: init DB and seed if empty
+    # Startup: init DB only
     init_db()
-    db_gen = get_db()
-    db = next(db_gen)
-    try:
-        count = db.query(Product).count()
-        if count == 0:
-            categories = [
-                "Electronics",
-                "Books",
-                "Home",
-                "Toys",
-                "Clothing",
-                "Sports",
-                "Garden",
-            ]
-
-            products = [
-                "Wireless Mouse",
-                "USB-C Charger",
-                "LED Desk Lamp",
-                "Stainless Water Bottle",
-                "Bluetooth Speaker",
-                "Yoga Mat",
-                "Novel Paperback",
-                "Coffee Mug",
-                "Backpack",
-                "Board Game",
-            ]
-
-            items = []
-            for i in range(1, 6):
-                item = Product(
-                    id=i,
-                    category=random.choice(categories),
-                    product=random.choice(products),
-                    price=round(random.uniform(5.0, 250.0), 2),
-                )
-                items.append(item)
-
-            db.add_all(items)
-            db.commit()
-    except Exception as e:
-        db.rollback()
-        print(f"Ошибка при инициализации базы данных: {e}")
-    finally:
-        db.close()
 
     # Yield control to application
     yield
