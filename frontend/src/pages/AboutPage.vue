@@ -37,6 +37,16 @@ async function addProduct() {
   }
 }
 
+async function deleteProduct(id: number) {
+  try {
+    const response = await fetch(`${baseURL}/${id}`, { method: 'DELETE' })
+    if (!response.ok) throw new Error(`Request failed: ${response.status}`)
+    items.value = items.value.filter((item) => item.id !== id)
+  } catch (e: any) {
+    error.value = e?.message ?? 'Failed to delete product'
+  }
+}
+
 onMounted(async () => {
   await loadItems()
 })
@@ -58,6 +68,7 @@ onMounted(async () => {
           <th>Category</th>
           <th>Product</th>
           <th>Price</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -66,6 +77,14 @@ onMounted(async () => {
           <td>{{ item.category }}</td>
           <td>{{ item.product }}</td>
           <td>{{ item.price.toFixed(2) }}</td>
+          <td>
+            <button
+              class="icon-btn"
+              @click="deleteProduct(item.id)"
+              aria-label="Удалить"
+              title="Удалить"
+            >🗑</button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -92,6 +111,18 @@ onMounted(async () => {
 
 .error {
   color: #b00020;
+}
+
+.icon-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.icon-btn:hover {
+  opacity: 0.8;
 }
 </style>
 
