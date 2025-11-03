@@ -11,11 +11,10 @@ type Item = {
 const items = ref<Item[]>([])
 const loading = ref<boolean>(true)
 const error = ref<string>('')
+const baseURL = 'http://81.177.166.4:8000'
 
-onMounted(async () => {
+async function loadItems() {
   try {
-    const baseURL = 'http://81.177.166.4:8000'
-    console.log(import.meta.env)
     const response = await fetch(`${baseURL}/`)
     if (!response.ok) throw new Error(`Request failed: ${response.status}`)
     const data: Item[] = await response.json()
@@ -25,6 +24,21 @@ onMounted(async () => {
   } finally {
     loading.value = false
   }
+}
+
+async function addProduct() {
+  try {
+    const response = await fetch(`${baseURL}/`, { method: 'POST' })
+    if (!response.ok) throw new Error(`Request failed: ${response.status}`)
+    const created: Item = await response.json()
+    items.value = [...items.value, created]
+  } catch (e: any) {
+    error.value = e?.message ?? 'Failed to add product'
+  }
+}
+
+onMounted(async () => {
+  await loadItems()
 })
 </script>
 
@@ -32,6 +46,8 @@ onMounted(async () => {
   <div class="about-page">
     <h1>About</h1>
     <p>This is the About page.</p>
+    <button @click="addProduct">Add product</button>
+
 
     <div v-if="loading">Loading...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
