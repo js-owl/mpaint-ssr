@@ -3,25 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from database import init_db, get_db, Product
 import random
+from contextlib import asynccontextmanager
 
 
-app = FastAPI(title="mpaint API", version="0.1.0")
-
-# Allow CORS for local/dev usage; adjust origins for production as needed
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-@app.on_event("startup")
-def startup_event():
-    # Создаем таблицы при запуске приложения
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: init DB and seed if empty
     init_db()
-    # Заполняем базу данных начальными данными, если она пуста
     db_gen = get_db()
     db = next(db_gen)
     try:
@@ -68,6 +56,22 @@ def startup_event():
     finally:
         db.close()
 
+    # Yield control to application
+    yield
+
+    # Shutdown: nothing to clean up
+
+
+app = FastAPI(title="mpaint API", version="0.1.0", lifespan=lifespan)
+
+# Allow CORS for local/dev usage; adjust origins for production as needed
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def read_root(db: Session = Depends(get_db)):
