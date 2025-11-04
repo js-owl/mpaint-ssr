@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import init_db
 from products.views import router
+from products.schema import Product  # Import to register model with Base.metadata
 from contextlib import asynccontextmanager
 
 

@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, Numeric
+from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
@@ -17,16 +17,6 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Базовый класс для моделей
 Base = declarative_base()
-
-
-# Модель таблицы продуктов (соответствует структуре из main.py)
-class Product(Base):
-    __tablename__ = "products"
-
-    id = Column(Integer, primary_key=True, index=True)
-    category = Column(String, nullable=False)
-    product = Column(String, nullable=False)
-    price = Column(Numeric(10, 2), nullable=False)
 
 
 # Функция для создания таблиц
