@@ -54,10 +54,8 @@ onMounted(async () => {
 
 <template>
   <div class="about-page">
-    <h1>About</h1>
-    <p>This is the About page.</p>
+    <h1>Products</h1>
     <button @click="addProduct">Add product</button>
-
 
     <div v-if="loading">Loading...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
@@ -125,5 +123,4 @@ onMounted(async () => {
   opacity: 0.8;
 }
 </style>
-
 
