@@ -4,7 +4,7 @@ from database import get_db
 from products.schema import Product
 import random
 
-router = APIRouter()
+router = APIRouter(prefix="/products", tags=["products"])
 
 
 @router.get("/")

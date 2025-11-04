@@ -15,7 +15,7 @@ const baseURL = 'http://81.177.166.4:8000'
 
 async function loadItems() {
   try {
-    const response = await fetch(`${baseURL}/`)
+    const response = await fetch(`${baseURL}/products`)
     if (!response.ok) throw new Error(`Request failed: ${response.status}`)
     const data: Item[] = await response.json()
     items.value = data
@@ -28,7 +28,7 @@ async function loadItems() {
 
 async function addProduct() {
   try {
-    const response = await fetch(`${baseURL}/`, { method: 'POST' })
+    const response = await fetch(`${baseURL}/products`, { method: 'POST' })
     if (!response.ok) throw new Error(`Request failed: ${response.status}`)
     const created: Item = await response.json()
     items.value = [...items.value, created]
@@ -39,7 +39,7 @@ async function addProduct() {
 
 async function deleteProduct(id: number) {
   try {
-    const response = await fetch(`${baseURL}/${id}`, { method: 'DELETE' })
+    const response = await fetch(`${baseURL}/products/${id}`, { method: 'DELETE' })
     if (!response.ok) throw new Error(`Request failed: ${response.status}`)
     items.value = items.value.filter((item) => item.id !== id)
   } catch (e: any) {
