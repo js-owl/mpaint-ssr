@@ -55,37 +55,25 @@ onMounted(async () => {
 <template>
   <div class="about-page">
     <h1>Products</h1>
-    <button @click="addProduct">Add product</button>
+    <el-button type="primary" @click="addProduct">Add product</el-button>
 
     <div v-if="loading">Loading...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
-    <table v-else class="data-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Category</th>
-          <th>Product</th>
-          <th>Price</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="item in items" :key="item.id">
-          <td>{{ item.id }}</td>
-          <td>{{ item.category }}</td>
-          <td>{{ item.product }}</td>
-          <td>{{ item.price.toFixed(2) }}</td>
-          <td>
-            <button
-              class="icon-btn"
-              @click="deleteProduct(item.id)"
-              aria-label="Удалить"
-              title="Удалить"
-            >🗑</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <el-table v-else :data="items" class="data-table" stripe style="width: 100%">
+      <el-table-column prop="id" label="ID" width="80" />
+      <el-table-column prop="category" label="Category" />
+      <el-table-column prop="product" label="Product" />
+      <el-table-column prop="price" label="Price" width="120">
+        <template #default="{ row }">
+          {{ Number(row.price).toFixed(2) }}
+        </template>
+      </el-table-column>
+      <el-table-column label="Actions" width="120">
+        <template #default="{ row }">
+          <el-button type="danger" size="small" @click="deleteProduct(row.id)">Delete</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
   </div>
 </template>
 
