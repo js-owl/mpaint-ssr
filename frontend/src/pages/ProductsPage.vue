@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { Delete } from '@element-plus/icons-vue'
 
 type Item = {
   id: number
@@ -70,7 +71,7 @@ onMounted(async () => {
       </el-table-column>
       <el-table-column label="Actions" width="120">
         <template #default="{ row }">
-          <el-button type="danger" size="small" @click="deleteProduct(row.id)">Delete</el-button>
+          <el-button type="danger" size="small" :icon="Delete" @click="deleteProduct(row.id)" />
         </template>
       </el-table-column>
     </el-table>
