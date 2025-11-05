@@ -1,20 +1,42 @@
 <template>
   <header class="header">
     <nav class="nav">
-      <div class="nav-desktop">
-        <router-link to="/" class="nav-link">Home</router-link>
-        <router-link to="/products" class="nav-link">Products</router-link>
+      <router-link to="/" class="logo">
+        <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Beaver body -->
+          <ellipse cx="50" cy="60" rx="35" ry="30" fill="#8B4513" stroke="#654321" stroke-width="2"/>
+          <!-- Beaver head -->
+          <ellipse cx="50" cy="25" rx="22" ry="20" fill="#8B4513" stroke="#654321" stroke-width="2"/>
+          <!-- Beaver tail -->
+          <ellipse cx="15" cy="65" rx="12" ry="25" fill="#654321" stroke="#543210" stroke-width="2"/>
+          <!-- Beaver ears -->
+          <ellipse cx="38" cy="18" rx="6" ry="8" fill="#654321"/>
+          <ellipse cx="62" cy="18" rx="6" ry="8" fill="#654321"/>
+          <!-- Beaver eyes -->
+          <circle cx="44" cy="25" r="3" fill="#1d1d1f"/>
+          <circle cx="56" cy="25" r="3" fill="#1d1d1f"/>
+          <!-- Beaver nose -->
+          <ellipse cx="50" cy="32" rx="4" ry="3" fill="#1d1d1f"/>
+          <!-- Beaver teeth -->
+          <path d="M48 35 L50 38 L52 35 Z" fill="#ffffff"/>
+        </svg>
+      </router-link>
+      <div class="nav-right">
+        <div class="nav-desktop">
+          <router-link to="/" class="nav-link">Home</router-link>
+          <router-link to="/products" class="nav-link">Products</router-link>
+        </div>
+        <button 
+          class="mobile-menu-toggle" 
+          @click="toggleMobileMenu"
+          :aria-expanded="isMobileMenuOpen"
+          aria-label="Toggle menu"
+        >
+          <span class="hamburger-line" :class="{ 'open': isMobileMenuOpen }"></span>
+          <span class="hamburger-line" :class="{ 'open': isMobileMenuOpen }"></span>
+          <span class="hamburger-line" :class="{ 'open': isMobileMenuOpen }"></span>
+        </button>
       </div>
-      <button 
-        class="mobile-menu-toggle" 
-        @click="toggleMobileMenu"
-        :aria-expanded="isMobileMenuOpen"
-        aria-label="Toggle menu"
-      >
-        <span class="hamburger-line" :class="{ 'open': isMobileMenuOpen }"></span>
-        <span class="hamburger-line" :class="{ 'open': isMobileMenuOpen }"></span>
-        <span class="hamburger-line" :class="{ 'open': isMobileMenuOpen }"></span>
-      </button>
       <div class="mobile-menu" :class="{ 'open': isMobileMenuOpen }">
         <router-link to="/" class="mobile-nav-link" @click="closeMobileMenu">Home</router-link>
         <router-link to="/products" class="mobile-nav-link" @click="closeMobileMenu">Products</router-link>
@@ -57,12 +79,33 @@ function closeMobileMenu() {
 .nav {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   max-width: 1200px;
   margin: 0 auto;
   padding: 0.75rem 1.5rem;
   height: 44px;
   position: relative;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+}
+
+.logo:hover {
+  opacity: 0.7;
+}
+
+.logo svg {
+  width: 32px;
+  height: 32px;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
 }
 
 .nav-desktop {
@@ -226,7 +269,6 @@ function closeMobileMenu() {
 /* Responsive Styles */
 @media (max-width: 768px) {
   .nav {
-    justify-content: space-between;
     padding: 0.75rem 1.5rem;
   }
 
