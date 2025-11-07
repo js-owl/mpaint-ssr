@@ -61,15 +61,14 @@ onMounted(async () => {
     <div v-if="loading">Loading...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
     <el-table v-else :data="items" class="data-table" stripe style="width: 100%">
-      <el-table-column prop="id" label="ID" width="80" />
-      <el-table-column prop="category" label="Category" />
-      <el-table-column prop="product" label="Product" />
-      <el-table-column prop="price" label="Price" width="120">
+      <el-table-column prop="category" label="Category"  width="80"/>
+      <el-table-column prop="product" label="Product"  width="130"/>
+      <el-table-column prop="price" label="Price" width="80">
         <template #default="{ row }">
           {{ Number(row.price).toFixed(2) }}
         </template>
       </el-table-column>
-      <el-table-column label="Actions" width="120">
+      <el-table-column label=" ">
         <template #default="{ row }">
           <el-button type="danger" size="small" :icon="Delete" @click="deleteProduct(row.id)" />
         </template>
@@ -110,6 +109,12 @@ onMounted(async () => {
 
 .icon-btn:hover {
   opacity: 0.8;
+}
+
+@media (max-width: 800px) {
+  .id-column {
+    display: none;
+  }
 }
 </style>
 
