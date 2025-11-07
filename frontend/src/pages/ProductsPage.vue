@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { Delete } from '@element-plus/icons-vue'
+import { API_BASE_URL } from '../api'
 
 type Item = {
   id: number
@@ -12,7 +13,7 @@ type Item = {
 const items = ref<Item[]>([])
 const loading = ref<boolean>(true)
 const error = ref<string>('')
-const baseURL = 'http://81.177.166.4:8000'
+const baseURL = API_BASE_URL
 
 async function loadItems() {
   try {

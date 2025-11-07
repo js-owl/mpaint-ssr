@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { Delete } from '@element-plus/icons-vue'
+import { API_BASE_URL } from '../api'
 
 type UserItem = {
   id: number
@@ -12,7 +13,8 @@ type UserItem = {
 const users = ref<UserItem[]>([])
 const loading = ref<boolean>(true)
 const error = ref<string>('')
-const baseURL = 'http://81.177.166.4:8000'
+const baseURL = API_BASE_URL
+const MAX_EMAIL_LENGTH = 18
 
 async function loadUsers() {
   try {
@@ -48,6 +50,11 @@ async function deleteUser(id: number) {
   }
 }
 
+function formatEmail(email: string): string {
+  if (email.length <= MAX_EMAIL_LENGTH) return email
+  return `${email.slice(0, MAX_EMAIL_LENGTH)}...`
+}
+
 onMounted(async () => {
   await loadUsers()
 })
@@ -62,9 +69,13 @@ onMounted(async () => {
     <div v-else-if="error" class="error">{{ error }}</div>
     <el-table v-else :data="users" class="data-table" stripe style="width: 100%">
       <el-table-column prop="name" label="Name" width="80" />
-      <el-table-column prop="email" label="Email" width="150" />
+    <el-table-column label="Email">
+      <template #default="{ row }">
+        <span :title="row.email">{{ formatEmail(row.email) }}</span>
+      </template>
+    </el-table-column>
       <el-table-column prop="role" label="Role" width="70" />
-      <el-table-column label=" ">
+      <el-table-column label=" "  width="60">
         <template #default="{ row }">
           <el-button type="danger" size="small" :icon="Delete" @click="deleteUser(row.id)" />
         </template>
