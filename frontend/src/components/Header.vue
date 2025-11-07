@@ -2,7 +2,7 @@
   <header class="header">
     <nav class="nav">
       <router-link to="/" class="logo">
-        <BeaverIcon />
+        <img :src="beaverImageUrl" alt="Beaver logo" class="logo-img" />
       </router-link>
       <div class="nav-right">
         <div class="nav-desktop">
@@ -35,7 +35,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import BeaverIcon from '@/icons/BeaverIcon.vue'
+import beaverImageUrl from '@/icons/beaver.jpg'
 
 const isMobileMenuOpen = ref(false)
 
@@ -82,7 +82,7 @@ function closeMobileMenu() {
   opacity: 0.7;
 }
 
-.logo svg {
+.logo-img {
   width: 32px;
   height: 32px;
 }
