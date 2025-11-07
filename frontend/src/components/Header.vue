@@ -6,8 +6,8 @@
       </router-link>
       <div class="nav-right">
         <div class="nav-desktop">
-          <router-link to="/" class="nav-link">Home</router-link>
-          <router-link to="/products" class="nav-link">Products</router-link>
+          <router-link to="/" class="nav-link">Главная</router-link>
+          <router-link to="/products" class="nav-link">Продукты</router-link>
         </div>
         <button 
           class="mobile-menu-toggle" 
@@ -21,8 +21,8 @@
         </button>
       </div>
       <div class="mobile-menu" :class="{ 'open': isMobileMenuOpen }">
-        <router-link to="/" class="mobile-nav-link" @click="closeMobileMenu">Home</router-link>
-        <router-link to="/products" class="mobile-nav-link" @click="closeMobileMenu">Products</router-link>
+        <router-link to="/" class="mobile-nav-link" @click="closeMobileMenu">Главная</router-link>
+        <router-link to="/products" class="mobile-nav-link" @click="closeMobileMenu">Продукты</router-link>
       </div>
     </nav>
     <div 

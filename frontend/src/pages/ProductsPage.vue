@@ -55,8 +55,8 @@ onMounted(async () => {
 
 <template>
   <div class="about-page">
-    <h1>Products</h1>
-    <el-button type="primary" @click="addProduct">Add product</el-button>
+    <h1>Продукты</h1>
+    <el-button type="primary" @click="addProduct">Добавить продукт</el-button>
 
     <div v-if="loading">Loading...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
