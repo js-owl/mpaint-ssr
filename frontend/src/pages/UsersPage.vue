@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { Delete } from '@element-plus/icons-vue'
-import { API_BASE_URL } from '../api'
+import { API_BASE_URL as baseURL } from '../api'
 
 type UserItem = {
   id: number
@@ -13,7 +13,6 @@ type UserItem = {
 const users = ref<UserItem[]>([])
 const loading = ref<boolean>(true)
 const error = ref<string>('')
-const baseURL = API_BASE_URL
 const MAX_EMAIL_LENGTH = 18
 
 async function loadUsers() {
