@@ -1,8 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import init_db
-from products.views import router
+from products.views import router as products_router
 from products.schema import Product  # Import to register model with Base.metadata
+from users.views import router as users_router
+from users.schema import User  # Import to register model with Base.metadata
 from contextlib import asynccontextmanager
 
 
@@ -28,4 +30,5 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(router)
+app.include_router(products_router)
+app.include_router(users_router)
