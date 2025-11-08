@@ -11,6 +11,13 @@
           <router-link to="/users" class="nav-link">Пользователи</router-link>
         </div>
         <button 
+          type="button" 
+          class="nav-register-button" 
+          @click="openRegistrationDialog"
+        >
+          Регистрация
+        </button>
+        <button 
           class="mobile-menu-toggle" 
           @click="toggleMobileMenu"
           :aria-expanded="isMobileMenuOpen"
@@ -25,21 +32,32 @@
         <router-link to="/" class="mobile-nav-link" @click="closeMobileMenu">Главная</router-link>
         <router-link to="/products" class="mobile-nav-link" @click="closeMobileMenu">Продукты</router-link>
         <router-link to="/users" class="mobile-nav-link" @click="closeMobileMenu">Пользователи</router-link>
+        <button 
+          type="button" 
+          class="mobile-nav-link mobile-register-button" 
+          @click="openRegistrationFromMobile"
+        >
+          Регистрация
+        </button>
       </div>
     </nav>
+
     <div 
       v-if="isMobileMenuOpen" 
       class="mobile-menu-overlay" 
       @click="closeMobileMenu"
     ></div>
   </header>
+  <DialogRegistration v-model="isRegistrationDialogOpen" />
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import beaverImageUrl from '@/icons/beaver.jpg'
+import DialogRegistration from '@/components/dialog/DialogRegistration.vue'
 
 const isMobileMenuOpen = ref(false)
+const isRegistrationDialogOpen = ref(false)
 
 function toggleMobileMenu() {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
@@ -47,6 +65,15 @@ function toggleMobileMenu() {
 
 function closeMobileMenu() {
   isMobileMenuOpen.value = false
+}
+
+function openRegistrationDialog() {
+  isRegistrationDialogOpen.value = true
+}
+
+function openRegistrationFromMobile() {
+  openRegistrationDialog()
+  closeMobileMenu()
 }
 </script>
 
@@ -92,12 +119,39 @@ function closeMobileMenu() {
 .nav-right {
   display: flex;
   align-items: center;
+  gap: 1.5rem;
 }
 
 .nav-desktop {
   display: flex;
   align-items: center;
   gap: 2.5rem;
+}
+
+.nav-register-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  border: 1px solid #1d1d1f;
+  background-color: #1d1d1f;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.nav-register-button:hover {
+  background-color: #fff;
+  color: #1d1d1f;
+}
+
+.nav-register-button:focus-visible {
+  outline: 2px solid rgba(29, 29, 31, 0.2);
+  outline-offset: 2px;
 }
 
 .nav-link {
@@ -262,6 +316,10 @@ function closeMobileMenu() {
     display: none;
   }
 
+  .nav-register-button {
+    display: none;
+  }
+
   .mobile-menu-toggle {
     display: flex;
   }
@@ -275,6 +333,20 @@ function closeMobileMenu() {
   .mobile-menu-overlay {
     display: none;
   }
+}
+
+.mobile-register-button {
+  background: transparent;
+  border: none;
+  text-align: left;
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.mobile-register-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 </style>
 
