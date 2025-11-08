@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage } from 'element-plus'
 import { useWindowSize } from '@vueuse/core'
+import { API_BASE_URL } from '@/api'
 
 const dialogFormVisible = defineModel<boolean>()
 
@@ -10,7 +11,6 @@ interface FormData {
   username: string
   password: string
   confirmPassword: string
-  user_type: string
   email: string
   full_name?: string
   phone_number?: string
@@ -22,7 +22,6 @@ const form = ref<FormData>({
   username: '',
   password: '',
   confirmPassword: '',
-  user_type: 'individual',
   email: '',
   full_name: '',
   phone_number: '',
@@ -30,6 +29,7 @@ const form = ref<FormData>({
 })
 
 const usernameError = ref('')
+const emailError = ref('')
 
 const loading = ref(false)
 
@@ -100,7 +100,6 @@ const onPhoneInput = (val: string) => {
 }
 
 const rules = ref<FormRules<FormData>>({
-  user_type: [{ required: true, message: 'Выберите тип пользователя', trigger: 'change' }],
   username: [
     { required: true, message: 'Пожалуйста, введите логин', trigger: 'blur' },
     { validator: validateLogin, trigger: 'blur' },
@@ -131,13 +130,13 @@ const closeDialog = () => {
     username: '',
     password: '',
     confirmPassword: '',
-    user_type: 'individual',
     email: '',
     full_name: '',
     phone_number: '',
     inn: '',
   }
   usernameError.value = ''
+  emailError.value = ''
   // Clear validation errors
   if (formRef.value) {
     formRef.value.clearValidate()
@@ -147,12 +146,45 @@ const closeDialog = () => {
 const submitForm = async () => {
   if (!formRef.value) return
 
+  usernameError.value = ''
+  emailError.value = ''
+
+  const isValid = await formRef.value.validate().catch(() => false)
+  if (!isValid) return
+
+  loading.value = true
+
   try {
-    await formRef.value.validate()
-    loading.value = true
+    const payload = {
+      name: form.value.full_name || form.value.username,
+      email: form.value.email,
+      password: form.value.password,
+    }
 
-    console.log('Form submitted:', form.value)
+    const response = await fetch(`${API_BASE_URL}/users/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
 
+    if (!response.ok) {
+      let errorMessage = 'Ошибка при регистрации'
+      let status: number | undefined
+      try {
+        const errorBody = await response.json()
+        if (typeof errorBody?.detail === 'string') {
+          errorMessage = errorBody.detail
+        }
+      } catch {
+        // ignore JSON parse errors
+      }
+      status = response.status
+      const error = new Error(errorMessage) as Error & { status?: number }
+      error.status = status
+      throw error
+    }
 
     ElMessage({
       type: 'success',
@@ -163,14 +195,19 @@ const submitForm = async () => {
     closeDialog()
   } catch (error) {
     console.error('Form validation/submit failed:', { error })
-    if (error instanceof Error && /400 Bad Request/i.test(error.message)) {
-      usernameError.value = 'Такой пользователь уже существует'
-      return
+    const err = error as Error & { status?: number }
+    if (err.status === 400) {
+      if (/email/i.test(err.message)) {
+        emailError.value = err.message
+      } else {
+        usernameError.value = err.message
+      }
+    } else {
+      ElMessage({
+        type: 'error',
+        message: err.message || 'Ошибка при регистрации',
+      })
     }
-    ElMessage({
-      type: 'error',
-      message: error instanceof Error ? error.message : 'Ошибка при регистрации',
-    })
   } finally {
     loading.value = false
   }
@@ -195,13 +232,6 @@ const submitForm = async () => {
       label-position="top"
       @submit.prevent="submitForm"
     >
-      <el-form-item prop="user_type">
-        <el-radio-group v-model="form.user_type">
-          <el-radio-button value="individual">Частное лицо</el-radio-button>
-          <el-radio-button value="legal">Компания</el-radio-button>
-        </el-radio-group>
-      </el-form-item>
-
       <el-form-item label="Логин" prop="username" :error="usernameError">
         <el-input
           v-model="form.username"
@@ -210,27 +240,16 @@ const submitForm = async () => {
         />
       </el-form-item>
 
-      <el-form-item label="Email" prop="email">
-        <el-input v-model="form.email" placeholder="Введите email" type="email" />
-      </el-form-item>
-
-      <el-form-item label="Полное имя" prop="full_name">
-        <el-input v-model="form.full_name" placeholder="Введите полное имя" />
-      </el-form-item>
-
-      <el-form-item label="Телефон" prop="phone_number">
+      <el-form-item label="Email" prop="email" :error="emailError">
         <el-input
-          v-model="form.phone_number"
-          placeholder="Введите телефон"
-          type="tel"
-          inputmode="numeric"
-          @input="onPhoneInput"
+          v-model="form.email"
+          placeholder="Введите email"
+          type="email"
+          @input="emailError = ''"
         />
       </el-form-item>
 
-      <el-form-item v-if="form.user_type === 'legal'" label="ИНН" prop="inn">
-        <el-input v-model="form.inn" placeholder="Введите ИНН" />
-      </el-form-item>
+
 
       <el-form-item label="Пароль" prop="password">
         <el-input
