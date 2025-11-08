@@ -1,75 +1,94 @@
+import os
+from datetime import datetime, timedelta
+
 from fastapi import APIRouter, Depends, HTTPException
+from jose import jwt
+from passlib.context import CryptContext
+from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
+
 from database import get_db
 from users.schema import User
-import random
 
 
 router = APIRouter(prefix="/users", tags=["users"])
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+SECRET_KEY = os.getenv("JWT_SECRET", "change_me")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("JWT_EXPIRE_MINUTES", "60"))
+
+
+class UserCreate(BaseModel):
+    name: str
+    email: EmailStr
+    role: str
+    password: str
+
+
+class UserOut(BaseModel):
+    id: int
+    name: str
+    email: EmailStr
+    role: str
+
+    class Config:
+        from_attributes = True
+
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+
+
+def get_password_hash(password: str) -> str:
+    return pwd_context.hash(password)
+
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return pwd_context.verify(plain_password, hashed_password)
+
+
+def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
+    to_encode = data.copy()
+    expire = datetime.utcnow() + (
+        expires_delta
+        if expires_delta is not None
+        else timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
 @router.get("/")
 def read_users(db: Session = Depends(get_db)):
     users = db.query(User).all()
-
-    items = []
-    for user in users:
-        items.append(
-            {
-                "id": user.id,
-                "name": user.name,
-                "email": user.email,
-                "role": user.role,
-            }
-        )
-
-    return items
+    return [UserOut.model_validate(user).model_dump() for user in users]
 
 
 @router.post("/")
-def create_user(db: Session = Depends(get_db)):
-    names = [
-        "Alice",
-        "Bob",
-        "Charlie",
-        "Diana",
-        "Eve",
-        "Frank",
-        "Grace",
-        "Heidi",
-        "Ivan",
-        "Judy",
-    ]
-
-    domains = ["example.com", "test.com", "sample.org", "mail.net"]
-
-    roles = [
-        "admin",
-        "editor",
-        "viewer",
-        "contributor",
-        "manager",
-    ]
-
-    name = random.choice(names)
-    email = f"{name.lower()}_{random.randint(1000, 9999)}@{random.choice(domains)}"
+def create_user(user_data: UserCreate, db: Session = Depends(get_db)):
+    existing = db.query(User).filter(User.email == user_data.email).first()
+    if existing is not None:
+        raise HTTPException(status_code=400, detail="Email already registered")
 
     new_user = User(
-        name=name,
-        email=email,
-        role=random.choice(roles),
+        name=user_data.name,
+        email=user_data.email,
+        role=user_data.role,
+        password_hash=get_password_hash(user_data.password),
     )
 
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
 
-    return {
-        "id": new_user.id,
-        "name": new_user.name,
-        "email": new_user.email,
-        "role": new_user.role,
-    }
+    return UserOut.model_validate(new_user).model_dump()
 
 
 @router.delete("/{user_id}")
@@ -82,5 +101,15 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     db.commit()
 
     return {"status": "deleted", "id": user_id}
+
+
+@router.post("/login")
+def login(user_data: UserLogin, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == user_data.email).first()
+    if user is None or not verify_password(user_data.password, user.password_hash):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    access_token = create_access_token({"sub": str(user.id)})
+    return Token(access_token=access_token).model_dump()
 
 
