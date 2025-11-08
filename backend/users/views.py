@@ -71,7 +71,7 @@ def read_users(db: Session = Depends(get_db)):
     return [UserOut.model_validate(user).model_dump() for user in users]
 
 
-@router.post("/")
+@router.post("/register")
 def create_user(user_data: UserCreate, db: Session = Depends(get_db)):
     existing = db.query(User).filter(User.email == user_data.email).first()
     if existing is not None:
