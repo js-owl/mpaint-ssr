@@ -22,7 +22,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("JWT_EXPIRE_MINUTES", "60"))
 class UserCreate(BaseModel):
     name: str
     email: EmailStr
-    role: str
+    role: str = "user"
     password: str
 
 
