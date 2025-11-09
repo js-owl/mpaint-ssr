@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { reactive, ref, computed } from 'vue'
+import { useAuthStore } from '@/stores/auth.store'
 import DialogRegistration from './DialogRegistration.vue'
 import { useWindowSize } from '@vueuse/core'
 import { ElMessage } from 'element-plus'
-import { API_BASE_URL } from '@/api'
 
 let dialogFormVisible = defineModel<boolean>()
 const formLabelWidth = '140px'
@@ -13,62 +13,27 @@ const formData = reactive({
   password: '',
 })
 
-const loading = ref(false)
-
 const isRegistrationVisible = ref(false)
+
+const authStore = useAuthStore()
 
 const { width } = useWindowSize()
 const isMobile = computed(() => width.value < 768)
 
 const onSubmit = async () => {
-  if (!formData.email || !formData.password) {
-    ElMessage.warning('Введите email и пароль')
-    return
-  }
-
-  loading.value = true
+  console.log('onSubmit', { formData })
+  if (!formData.email || !formData.password) return
   try {
-    const payload = {
-      email: formData.email.trim(),
-      password: formData.password,
-    }
-
-    const response = await fetch(`${API_BASE_URL}/users/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
-
-    if (!response.ok) {
-      let errorMessage = 'Ошибка входа'
-      try {
-        const errorBody = await response.json()
-        if (typeof errorBody?.detail === 'string') {
-          errorMessage = errorBody.detail
-        }
-      } catch {
-        // ignore JSON parse errors
-      }
-      throw new Error(errorMessage)
-    }
-
-    const data = await response.json()
-    if (data?.access_token) {
-      localStorage.setItem('access_token', data.access_token)
-    }
-
-    ElMessage.success('Вы успешно вошли')
+    await authStore.login(formData)
+    console.log('Dialog-login: token', authStore.getToken)
 
     formData.email = ''
     formData.password = ''
     dialogFormVisible.value = false
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Ошибка входа'
-    ElMessage.error(message)
-  } finally {
-    loading.value = false
+    console.log({ message })
+    ElMessage.error('Неправильное имя пользователя или пароль')
   }
 }
 
@@ -92,7 +57,7 @@ const onRegistration = async () => {
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="dialogFormVisible = false">Отмена</el-button>
-        <el-button type="primary" @click="onSubmit" :loading="loading"> Войти </el-button>
+        <el-button type="primary" @click="onSubmit"> Войти </el-button>
         <el-divider></el-divider>
         <div class="registration">
           <div style="margin-right: 20px">Еще нет аккаунта?</div>
