@@ -10,12 +10,12 @@
           <router-link to="/products" class="nav-link">Продукты</router-link>
           <router-link to="/users" class="nav-link">Пользователи</router-link>
         </div>
-        <button 
-          type="button" 
-          class="nav-register-button" 
-          @click="openRegistrationDialog"
+        <button
+          type="button"
+          class="nav-register-button"
+          @click="openLoginDialog"
         >
-          Регистрация
+          Войти
         </button>
         <button 
           class="mobile-menu-toggle" 
@@ -35,9 +35,9 @@
         <button 
           type="button" 
           class="mobile-nav-link mobile-register-button" 
-          @click="openRegistrationFromMobile"
+          @click="openLoginFromMobile"
         >
-          Регистрация
+          Вход
         </button>
       </div>
     </nav>
@@ -48,16 +48,16 @@
       @click="closeMobileMenu"
     ></div>
   </header>
-  <DialogRegistration v-model="isRegistrationDialogOpen" />
+  <DialogLogin v-model="isLoginDialogOpen" />
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import beaverImageUrl from '@/icons/beaver.jpg'
-import DialogRegistration from '@/components/dialog/DialogRegistration.vue'
+import DialogLogin from '@/components/dialog/DialogLogin.vue'
 
 const isMobileMenuOpen = ref(false)
-const isRegistrationDialogOpen = ref(false)
+const isLoginDialogOpen = ref(false)
 
 function toggleMobileMenu() {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
@@ -67,12 +67,12 @@ function closeMobileMenu() {
   isMobileMenuOpen.value = false
 }
 
-function openRegistrationDialog() {
-  isRegistrationDialogOpen.value = true
+function openLoginDialog() {
+  isLoginDialogOpen.value = true
 }
 
-function openRegistrationFromMobile() {
-  openRegistrationDialog()
+function openLoginFromMobile() {
+  openLoginDialog()
   closeMobileMenu()
 }
 </script>
