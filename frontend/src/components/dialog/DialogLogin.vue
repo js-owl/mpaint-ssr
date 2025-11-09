@@ -9,7 +9,7 @@ let dialogFormVisible = defineModel<boolean>()
 const formLabelWidth = '140px'
 
 const formData = reactive({
-  username: '',
+  email: '',
   password: '',
 })
 
@@ -21,7 +21,7 @@ const { width } = useWindowSize()
 const isMobile = computed(() => width.value < 768)
 
 const onSubmit = async () => {
-  if (!formData.username || !formData.password) {
+  if (!formData.email || !formData.password) {
     ElMessage.warning('Введите email и пароль')
     return
   }
@@ -29,7 +29,7 @@ const onSubmit = async () => {
   loading.value = true
   try {
     const payload = {
-      email: formData.username.trim(),
+      email: formData.email.trim(),
       password: formData.password,
     }
 
@@ -61,7 +61,7 @@ const onSubmit = async () => {
 
     ElMessage.success('Вы успешно вошли')
 
-    formData.username = ''
+    formData.email = ''
     formData.password = ''
     dialogFormVisible.value = false
   } catch (e) {
@@ -82,8 +82,8 @@ const onRegistration = async () => {
 <template>
   <el-dialog v-model="dialogFormVisible" title="Войти" width="500" :fullscreen="isMobile">
     <el-form :model="formData">
-      <el-form-item label="Имя" :label-width="formLabelWidth">
-        <el-input v-model="formData.username" autocomplete="off" />
+      <el-form-item label="Email" :label-width="formLabelWidth">
+        <el-input v-model="formData.email" autocomplete="off" />
       </el-form-item>
       <el-form-item label="Пароль" :label-width="formLabelWidth">
         <el-input v-model="formData.password" type="password" show-password />
