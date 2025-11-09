@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
 from database import Base
 
 
@@ -10,5 +11,7 @@ class User(Base):
     email = Column(String, unique=True, nullable=False, index=True)
     role = Column(String, nullable=False)
     password_hash = Column(String, nullable=False)
+
+    profile = relationship("Profile", back_populates="user", uselist=False)
 
 
