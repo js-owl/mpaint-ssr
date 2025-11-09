@@ -1,3 +1,48 @@
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+import { storeToRefs } from 'pinia'
+import beaverImageUrl from '@/icons/beaver.jpg'
+import DialogLogin from '@/components/dialog/DialogLogin.vue'
+import { useAuthStore } from '@/stores/auth.store'
+
+const isMobileMenuOpen = ref(false)
+const isLoginDialogOpen = ref(false)
+const authStore = useAuthStore()
+const { getToken } = storeToRefs(authStore)
+
+const isAuthenticated = computed(() => Boolean(getToken.value))
+const authButtonLabel = computed(() => (isAuthenticated.value ? 'Выйти' : 'Войти'))
+
+function toggleMobileMenu() {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value
+}
+
+function closeMobileMenu() {
+  isMobileMenuOpen.value = false
+}
+
+function openLoginDialog() {
+  isLoginDialogOpen.value = true
+}
+
+function openLoginFromMobile() {
+  if (isAuthenticated.value) {
+    authStore.clearToken()
+  } else {
+    openLoginDialog()
+  }
+  closeMobileMenu()
+}
+
+function handleAuthButtonClick() {
+  if (isAuthenticated.value) {
+    authStore.clearToken()
+  } else {
+    openLoginDialog()
+  }
+}
+</script>
+
 <template>
   <header class="header">
     <nav class="nav">
@@ -50,51 +95,6 @@
   </header>
   <DialogLogin v-model="isLoginDialogOpen" />
 </template>
-
-<script setup lang="ts">
-import { computed, ref } from 'vue'
-import { storeToRefs } from 'pinia'
-import beaverImageUrl from '@/icons/beaver.jpg'
-import DialogLogin from '@/components/dialog/DialogLogin.vue'
-import { useAuthStore } from '@/stores/auth.store'
-
-const isMobileMenuOpen = ref(false)
-const isLoginDialogOpen = ref(false)
-const authStore = useAuthStore()
-const { getToken } = storeToRefs(authStore)
-
-const isAuthenticated = computed(() => Boolean(getToken.value))
-const authButtonLabel = computed(() => (isAuthenticated.value ? 'Выйти' : 'Войти'))
-
-function toggleMobileMenu() {
-  isMobileMenuOpen.value = !isMobileMenuOpen.value
-}
-
-function closeMobileMenu() {
-  isMobileMenuOpen.value = false
-}
-
-function openLoginDialog() {
-  isLoginDialogOpen.value = true
-}
-
-function openLoginFromMobile() {
-  if (isAuthenticated.value) {
-    authStore.clearToken()
-  } else {
-    openLoginDialog()
-  }
-  closeMobileMenu()
-}
-
-function handleAuthButtonClick() {
-  if (isAuthenticated.value) {
-    authStore.clearToken()
-  } else {
-    openLoginDialog()
-  }
-}
-</script>
 
 <style scoped>
 .header {
