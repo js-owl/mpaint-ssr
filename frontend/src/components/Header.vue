@@ -4,14 +4,24 @@ import { storeToRefs } from 'pinia'
 import beaverImageUrl from '@/icons/beaver.jpg'
 import DialogLogin from '@/components/dialog/DialogLogin.vue'
 import { useAuthStore } from '@/stores/auth.store'
+import { useProfileStore } from '@/stores/profile.store'
 
 const isMobileMenuOpen = ref(false)
 const isLoginDialogOpen = ref(false)
 const authStore = useAuthStore()
+const profileStore = useProfileStore()
 const { getToken } = storeToRefs(authStore)
+const { profile } = storeToRefs(profileStore)
+const { clearProfile } = profileStore
 
 const isAuthenticated = computed(() => Boolean(getToken.value))
 const authButtonLabel = computed(() => (isAuthenticated.value ? 'Выйти' : 'Войти'))
+const userFirstName = computed(() => profile.value?.first_name ?? '')
+
+function logout() {
+  authStore.clearToken()
+  clearProfile()
+}
 
 function toggleMobileMenu() {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
@@ -27,7 +37,7 @@ function openLoginDialog() {
 
 function openLoginFromMobile() {
   if (isAuthenticated.value) {
-    authStore.clearToken()
+    logout()
   } else {
     openLoginDialog()
   }
@@ -36,7 +46,7 @@ function openLoginFromMobile() {
 
 function handleAuthButtonClick() {
   if (isAuthenticated.value) {
-    authStore.clearToken()
+    logout()
   } else {
     openLoginDialog()
   }
@@ -55,6 +65,9 @@ function handleAuthButtonClick() {
           <router-link to="/products" class="nav-link">Продукты</router-link>
           <router-link to="/users" class="nav-link">Пользователи</router-link>
         </div>
+        <span v-if="isAuthenticated && userFirstName" class="nav-user">
+          {{ userFirstName }}
+        </span>
         <button
           type="button"
           class="nav-register-button"
@@ -145,6 +158,12 @@ function handleAuthButtonClick() {
   display: flex;
   align-items: center;
   gap: 2.5rem;
+}
+
+.nav-user {
+  font-size: 16px;
+  font-weight: 500;
+  color: #1d1d1f;
 }
 
 .nav-register-button {
@@ -273,6 +292,13 @@ function handleAuthButtonClick() {
 .mobile-menu.open {
   max-height: 300px;
   opacity: 1;
+}
+
+.mobile-user-greeting {
+  padding: 0.75rem 1.5rem;
+  font-size: 16px;
+  font-weight: 500;
+  color: #1d1d1f;
 }
 
 .mobile-nav-link {
