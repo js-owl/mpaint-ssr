@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import { Delete } from '@element-plus/icons-vue'
 import { API_BASE_URL as baseURL } from '../api'
+import { useProfileStore } from '../stores/profile.store'
 
 type Item = {
   id: number
@@ -13,6 +15,9 @@ type Item = {
 const items = ref<Item[]>([])
 const loading = ref<boolean>(true)
 const error = ref<string>('')
+
+const profileStore = useProfileStore()
+const { profile } = storeToRefs(profileStore)
 
 async function loadItems() {
   try {
@@ -26,8 +31,6 @@ async function loadItems() {
     loading.value = false
   }
 }
-
-const DEFAULT_USER_ID = 1
 
 async function addProduct() {
   try {
@@ -51,8 +54,14 @@ async function deleteProduct(id: number) {
 }
 
 async function addToCart(productId: number) {
+  const userId = profile.value?.id
+  if (!userId) {
+    error.value = 'User not loaded'
+    return
+  }
+
   try {
-    const response = await fetch(`${baseURL}/cart/${DEFAULT_USER_ID}`, {
+    const response = await fetch(`${baseURL}/cart/${userId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ product_id: productId, quantity: 1 }),
