@@ -12,6 +12,7 @@ router = APIRouter(prefix="/profile", tags=["profile"])
 
 
 class ProfileResponse(BaseModel):
+    id: int
     username: str
     email: EmailStr
     first_name: str | None = None
@@ -45,6 +46,7 @@ def get_profile(
 ):
     profile = _get_or_create_profile(db, current_user)
     return ProfileResponse(
+        id=profile.id,
         username=profile.username,
         email=current_user.email,
         first_name=profile.first_name or "",
@@ -80,6 +82,7 @@ def update_profile(
     db.refresh(profile)
 
     return ProfileResponse(
+        id=profile.id,
         username=profile.username,
         email=current_user.email,
         first_name=profile.first_name or "",
