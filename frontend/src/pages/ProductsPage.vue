@@ -27,6 +27,8 @@ async function loadItems() {
   }
 }
 
+const DEFAULT_USER_ID = 1
+
 async function addProduct() {
   try {
     const response = await fetch(`${baseURL}/products`, { method: 'POST' })
@@ -48,6 +50,20 @@ async function deleteProduct(id: number) {
   }
 }
 
+async function addToCart(productId: number) {
+  try {
+    const response = await fetch(`${baseURL}/cart/${DEFAULT_USER_ID}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ product_id: productId, quantity: 1 }),
+    })
+    if (!response.ok) throw new Error(`Request failed: ${response.status}`)
+    error.value = ''
+  } catch (e: any) {
+    error.value = e?.message ?? 'Failed to add product to cart'
+  }
+}
+
 onMounted(async () => {
   await loadItems()
 })
@@ -66,6 +82,11 @@ onMounted(async () => {
       <el-table-column prop="price" label="Price" width="80">
         <template #default="{ row }">
           {{ Number(row.price).toFixed(2) }}
+        </template>
+      </el-table-column>
+      <el-table-column label=" " width="60">
+        <template #default="{ row }">
+          <el-button type="success" size="small" @click="addToCart(row.id)">cart</el-button>
         </template>
       </el-table-column>
       <el-table-column label=" " width="60">
