@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import init_db
+from cart import router as cart_router
+from cart.schema import CartItem  # Import to register model with Base.metadata
 from products.views import router as products_router
 from products.schema import Product  # Import to register model with Base.metadata
 from profile.views import router as profile_router
@@ -35,3 +37,4 @@ app.add_middleware(
 app.include_router(products_router)
 app.include_router(users_router)
 app.include_router(profile_router)
+app.include_router(cart_router)

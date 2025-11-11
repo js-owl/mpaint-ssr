@@ -13,5 +13,10 @@ class User(Base):
     password_hash = Column(String, nullable=False)
 
     profile = relationship("Profile", back_populates="user", uselist=False)
+    cart_items = relationship(
+        "CartItem",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
 
 
