@@ -19,6 +19,15 @@ const error = ref<string>('')
 const profileStore = useProfileStore()
 const { profile } = storeToRefs(profileStore)
 
+async function ensureProfileLoaded() {
+  if (profile.value) return
+  try {
+    await profileStore.getProfile()
+  } catch (e: any) {
+    error.value = e?.message ?? 'Failed to load profile'
+  }
+}
+
 async function loadItems() {
   try {
     const response = await fetch(`${baseURL}/products`)
@@ -54,6 +63,8 @@ async function deleteProduct(id: number) {
 }
 
 async function addToCart(productId: number) {
+  await ensureProfileLoaded()
+  console.log('|- addToCart', productId, profile.value)
   const userId = profile.value?.id
   if (!userId) {
     error.value = 'User not loaded'
@@ -74,6 +85,7 @@ async function addToCart(productId: number) {
 }
 
 onMounted(async () => {
+  await ensureProfileLoaded()
   await loadItems()
 })
 </script>
