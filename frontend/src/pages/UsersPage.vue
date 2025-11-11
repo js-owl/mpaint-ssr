@@ -68,11 +68,11 @@ onMounted(async () => {
     <div v-else-if="error" class="error">{{ error }}</div>
     <el-table v-else :data="users" class="data-table" stripe style="width: 100%">
       <el-table-column prop="name" label="Name" width="80" />
-    <el-table-column label="Email">
-      <template #default="{ row }">
-        <span :title="row.email">{{ formatEmail(row.email) }}</span>
-      </template>
-    </el-table-column>
+      <el-table-column label="Email">
+        <template #default="{ row }">
+          <span :title="row.email">{{ formatEmail(row.email) }}</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="role" label="Role" width="70" />
       <el-table-column label=" "  width="60">
         <template #default="{ row }">

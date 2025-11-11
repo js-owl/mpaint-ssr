@@ -62,13 +62,13 @@ onMounted(async () => {
     <div v-else-if="error" class="error">{{ error }}</div>
     <el-table v-else :data="items" class="data-table" stripe style="width: 100%">
       <el-table-column prop="category" label="Category"  width="80"/>
-      <el-table-column prop="product" label="Product"  width="130"/>
+      <el-table-column prop="product" label="Product"/>
       <el-table-column prop="price" label="Price" width="80">
         <template #default="{ row }">
           {{ Number(row.price).toFixed(2) }}
         </template>
       </el-table-column>
-      <el-table-column label=" ">
+      <el-table-column label=" " width="60">
         <template #default="{ row }">
           <el-button type="danger" size="small" :icon="Delete" @click="deleteProduct(row.id)" />
         </template>
