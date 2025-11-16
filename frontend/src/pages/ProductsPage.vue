@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { Delete } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
@@ -17,6 +18,7 @@ const items = ref<Item[]>([])
 const loading = ref<boolean>(true)
 const error = ref<string>('')
 
+const router = useRouter()
 const profileStore = useProfileStore()
 const { profile } = storeToRefs(profileStore)
 
@@ -39,17 +41,6 @@ async function loadItems() {
     error.value = e?.message ?? 'Failed to load data'
   } finally {
     loading.value = false
-  }
-}
-
-async function addProduct() {
-  try {
-    const response = await fetch(`${baseURL}/products`, { method: 'POST' })
-    if (!response.ok) throw new Error(`Request failed: ${response.status}`)
-    const created: Item = await response.json()
-    items.value = [...items.value, created]
-  } catch (e: any) {
-    error.value = e?.message ?? 'Failed to add product'
   }
 }
 
@@ -100,7 +91,7 @@ onMounted(async () => {
 <template>
   <div class="about-page">
     <h1>Продукты</h1>
-    <el-button type="primary" @click="addProduct">Добавить продукт</el-button>
+    <el-button type="primary" @click="router.push('/product')">Добавить продукт</el-button>
 
     <div v-if="loading">Loading...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
