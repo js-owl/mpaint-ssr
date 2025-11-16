@@ -62,6 +62,7 @@ function handleAuthButtonClick() {
       <div class="nav-right">
         <div class="nav-desktop">
           <router-link to="/" class="nav-link">Главная</router-link>
+          <router-link to="/product" class="nav-link">Добавить продукт</router-link>
           <router-link to="/products" class="nav-link">Продукты</router-link>
           <router-link to="/cart" class="nav-link">Корзина</router-link>
           <router-link to="/users" class="nav-link">Пользователи</router-link>
@@ -89,6 +90,7 @@ function handleAuthButtonClick() {
       </div>
       <div class="mobile-menu" :class="{ 'open': isMobileMenuOpen }">
         <router-link to="/" class="mobile-nav-link" @click="closeMobileMenu">Главная</router-link>
+        <router-link to="/product" class="mobile-nav-link" @click="closeMobileMenu">Добавить продукт</router-link>
         <router-link to="/products" class="mobile-nav-link" @click="closeMobileMenu">Продукты</router-link>
         <router-link to="/cart" class="mobile-nav-link" @click="closeMobileMenu">Корзина</router-link>
         <router-link to="/users" class="mobile-nav-link" @click="closeMobileMenu">Пользователи</router-link>

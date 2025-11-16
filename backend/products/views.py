@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from products.schema import Product
 import random
+from pydantic import BaseModel, Field
 
 router = APIRouter(prefix="/products", tags=["products"])
 
@@ -26,36 +27,18 @@ def read_root(db: Session = Depends(get_db)):
     return items
 
 
+class ProductCreate(BaseModel):
+    category: str = Field(..., min_length=1)
+    product: str = Field(..., min_length=1)
+    price: float = Field(..., gt=0)
+
+
 @router.post("/")
-def create_product(db: Session = Depends(get_db)):
-    # Создаем и сохраняем случайный продукт
-    categories = [
-        "Electronics",
-        "Books",
-        "Home",
-        "Toys",
-        "Clothing",
-        "Sports",
-        "Garden",
-    ]
-
-    products = [
-        "Wireless Mouse",
-        "USB-C Charger",
-        "LED Desk Lamp",
-        "Stainless Water Bottle",
-        "Bluetooth Speaker",
-        "Yoga Mat",
-        "Novel Paperback",
-        "Coffee Mug",
-        "Backpack",
-        "Board Game",
-    ]
-
+def create_product(payload: ProductCreate, db: Session = Depends(get_db)):
     new_product = Product(
-        category=random.choice(categories),
-        product=random.choice(products),
-        price=round(random.uniform(5.0, 250.0), 2),
+        category=payload.category,
+        product=payload.product,
+        price=payload.price,
     )
 
     db.add(new_product)
