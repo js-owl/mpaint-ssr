@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { Delete } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 import { API_BASE_URL as baseURL } from '../api'
 import { useProfileStore } from '../stores/profile.store'
 
@@ -55,10 +56,16 @@ async function addProduct() {
 async function deleteProduct(id: number) {
   try {
     const response = await fetch(`${baseURL}/products/${id}`, { method: 'DELETE' })
+    if (response.status === 409) {
+      ElMessage.warning('Товар нельзя удалить: он находится в корзине')
+      return
+    }
     if (!response.ok) throw new Error(`Request failed: ${response.status}`)
     items.value = items.value.filter((item) => item.id !== id)
+    ElMessage.success('Товар удалён')
   } catch (e: any) {
     error.value = e?.message ?? 'Failed to delete product'
+    ElMessage.error('Не удалось удалить товар')
   }
 }
 

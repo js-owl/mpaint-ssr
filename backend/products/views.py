@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from database import get_db
 from products.schema import Product
 import random
@@ -59,8 +60,13 @@ def delete_product(product_id: int, db: Session = Depends(get_db)):
     if product is None:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    db.delete(product)
-    db.commit()
+    try:
+        db.delete(product)
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        # Likely referenced by cart items or other FKs
+        raise HTTPException(status_code=409, detail="Product cannot be deleted because it is referenced by other records")
 
     return {"status": "deleted", "id": product_id}
 
