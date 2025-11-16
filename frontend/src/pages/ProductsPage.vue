@@ -83,7 +83,6 @@ async function addToCart(productId: number) {
 }
 
 onMounted(async () => {
-  await ensureProfileLoaded()
   await loadItems()
 })
 </script>
